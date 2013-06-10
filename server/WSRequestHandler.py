@@ -66,14 +66,14 @@ class WSRequestHandler(SimpleHTTPRequestHandler):
                 except Exception as e:
                     self.send_response(500, 'Error')
                     res = e
-                
+
                 self.send_header('Content-type', 'text/plain')
                 self.send_header('Content-Length', len(res))
                 self.end_headers()
                 self.wfile.write(bytes(res))
                 return
             elif _file:
-                if isinstance(_file['buffer'], file):
+                if hasattr(_file['buffer'], 'read'):
                     buffer = _file['buffer'].read()
                 else:
                     buffer = _file['buffer']
@@ -82,7 +82,7 @@ class WSRequestHandler(SimpleHTTPRequestHandler):
                 self.send_header('Content-type', _file['content_type'])
                 self.send_header('Content-Length', len(buffer))
                 self.end_headers()
-                self.wfile.write(bytes(buffer))
+                self.wfile.write(buffer.encode())
                 return
             else:
 
@@ -92,7 +92,7 @@ class WSRequestHandler(SimpleHTTPRequestHandler):
                 self.send_header('Content-type', 'text/plain')
                 self.send_header('Content-Length', len('Method Not Allowed'))
                 self.end_headers()
-                self.wfile.write(bytes('Method Not Allowed'))
+                self.wfile.write('Method Not Allowed'.encode())
                 return
 
     def send_response(self, code, message=None):
